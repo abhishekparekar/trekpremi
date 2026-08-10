@@ -189,8 +189,8 @@ const Home = () => {
         }
       `}</style>
 
-      {/* Hero Section */}
-      <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
+      {/* Hero Section - Compact on mobile, full height on desktop */}
+      <div className="relative w-full h-[72vh] min-h-[460px] md:h-screen bg-black overflow-hidden flex items-center justify-center pt-16 md:pt-0">
         {/* Background Background Images Slider */}
         <AnimatePresence initial={false}>
           <motion.img
@@ -215,24 +215,24 @@ const Home = () => {
           variants={heroContentVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 text-center text-white px-6 max-w-5xl flex flex-col items-center"
+          className="relative z-10 text-center text-white px-4 sm:px-6 max-w-5xl flex flex-col items-center"
         >
           {/* Badge indicator */}
           <motion.div
             variants={heroItemVariants}
             whileHover={{ scale: 1.05 }}
-            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/25 text-xs sm:text-sm font-semibold tracking-wider text-[#F5B301] shadow-lg select-none cursor-default transition-shadow duration-300 hover:shadow-[#F5B301]/10 hover:shadow-xl"
+            className="mb-3 sm:mb-5 inline-flex items-center gap-2 px-3.5 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/25 text-[11px] sm:text-xs font-semibold tracking-wider text-[#F5B301] shadow-lg select-none cursor-default"
           >
-            🏔️ Premium Trekking & Adventures
+            🏔️ Premium Trekking &amp; Adventures
           </motion.div>
 
           {/* Heading */}
           <motion.h1
             variants={heroItemVariants}
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight leading-none drop-shadow-2xl flex flex-wrap justify-center gap-x-3 sm:gap-x-5"
+            className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 sm:mb-5 tracking-tight leading-none drop-shadow-2xl flex flex-wrap justify-center gap-x-2 sm:gap-x-5"
             style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
           >
-            <span className="inline-block overflow-hidden py-1">
+            <span className="inline-block overflow-hidden py-0.5">
               <motion.span
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
@@ -242,7 +242,7 @@ const Home = () => {
                 Trek
               </motion.span>
             </span>
-            <span className="inline-block overflow-hidden py-1">
+            <span className="inline-block overflow-hidden py-0.5">
               <motion.span
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
@@ -252,12 +252,12 @@ const Home = () => {
                 Premi
               </motion.span>
             </span>
-            <span className="inline-block overflow-hidden py-1">
+            <span className="inline-block overflow-hidden py-0.5">
               <motion.span
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 transition={{ duration: 1.0, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="inline-block text-[#F5B301] drop-shadow-[0_0_20px_rgba(245,179,1,0.45)] typing-cursor pr-2"
+                className="inline-block text-[#F5B301] drop-shadow-[0_0_20px_rgba(245,179,1,0.45)] typing-cursor pr-1.5"
               >
                 {typedText}
               </motion.span>
@@ -267,7 +267,7 @@ const Home = () => {
           {/* Tagline */}
           <motion.p
             variants={heroItemVariants}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium tracking-wide text-gray-200 max-w-4xl mx-auto leading-relaxed drop-shadow-lg min-h-[2em] mb-6"
+            className="text-xs sm:text-base md:text-xl lg:text-2xl font-medium tracking-wide text-gray-200 max-w-4xl mx-auto leading-relaxed drop-shadow-lg min-h-[2em] mb-4 sm:mb-6"
           >
             {typedTagline}
           </motion.p>
@@ -275,20 +275,20 @@ const Home = () => {
           {/* 2 CTA Action Buttons: Explore & Contact */}
           <motion.div
             variants={heroItemVariants}
-            className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-2"
+            className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mt-1"
           >
             <Link
               to="/trips"
-              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#F5B301] hover:bg-[#e0a200] text-gray-950 font-black text-sm sm:text-base shadow-lg transition-all active:scale-95 flex items-center gap-2"
+              className="px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-full bg-[#F5B301] hover:bg-[#e0a200] text-gray-950 font-black text-xs sm:text-sm md:text-base shadow-lg transition-all active:scale-95 flex items-center gap-1.5"
             >
-              Explore Tours <Compass size={18} />
+              Explore Tours <Compass size={16} />
             </Link>
 
             <Link
               to="/contact"
-              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-white/15 hover:bg-white/30 text-white font-bold text-sm sm:text-base border border-white/40 backdrop-blur-md transition-all active:scale-95 flex items-center gap-2"
+              className="px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-full bg-white/15 hover:bg-white/30 text-white font-bold text-xs sm:text-sm md:text-base border border-white/40 backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
             >
-              Contact Us <PhoneCall size={18} />
+              Contact Us <PhoneCall size={16} />
             </Link>
           </motion.div>
         </motion.div>
