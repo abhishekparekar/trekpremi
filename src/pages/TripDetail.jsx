@@ -32,6 +32,59 @@ const parseMealList = (mealsText) => {
   return [mealsText];
 };
 
+const parseListItems = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data.map(i => String(i).trim()).filter(Boolean);
+  if (typeof data === 'string') {
+    if (data.includes('\n')) {
+      return data.split('\n').map(s => s.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+    }
+    return data.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+const parseThingsToCarry = (data) => {
+  const items = parseListItems(data);
+  if (items.length === 0) return [];
+
+  const categoriesMap = new Map();
+  let currentCategory = 'Essentials';
+
+  items.forEach(item => {
+    let cat = currentCategory;
+    let text = item;
+
+    if (item.includes(':')) {
+      const parts = item.split(':');
+      if (parts.length > 2) {
+        cat = parts[0].trim();
+        text = parts.slice(1).join(':').trim();
+      } else {
+        const potentialCat = parts[0].trim();
+        if (potentialCat.length < 25 && !potentialCat.includes(' ')) {
+          cat = potentialCat;
+          text = parts[1].trim();
+        }
+      }
+    }
+
+    if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
+    
+    let title = '';
+    let detail = text;
+    if (text.includes(':')) {
+      const subParts = text.split(':');
+      title = subParts[0].trim();
+      detail = subParts.slice(1).join(':').trim();
+    }
+
+    categoriesMap.get(cat).push({ title, detail, fullText: text });
+  });
+
+  return Array.from(categoriesMap.entries()).map(([category, items]) => ({ category, items }));
+};
+
 const isSaturday = (dateStr) => {
   if (!dateStr) return false;
   const parts = dateStr.split('-');
@@ -55,6 +108,7 @@ const TripDetail = () => {
 
   // Active section tab & scroll states
   const [activeTab, setActiveTab] = useState('Highlight');
+  const [incExcTab, setIncExcTab] = useState('inclusion');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // City filter for Dates section
@@ -662,92 +716,138 @@ const TripDetail = () => {
                 )}
               </div>
 
-              {/* INC & EXC CARD */}
+              {/* INC & EXC CARD WITH SUB-TABS (Matching Screenshot 4) */}
               <div id="section-inc-exc" className="scroll-mt-48 md:scroll-mt-36 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-5">
-                  Inclusions &amp; Exclusions
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Inclusions */}
-                  <div className="bg-emerald-50/40 border border-emerald-200 rounded-2xl p-4">
-                    <h4 className="font-bold text-sm sm:text-base text-emerald-900 mb-3 flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                      Inclusions
-                    </h4>
-                    {(trip.inclusions || []).length > 0 ? (
-                      <ul className="space-y-2">
-                        {(trip.inclusions || []).map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-gray-800 font-medium">
-                            <Check size={14} className="text-emerald-600 mt-0.5 flex-shrink-0" strokeWidth={2.5} />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-xs text-gray-500">Standard transport &amp; stay included.</p>
+                {/* Sub-Tabs Header */}
+                <div className="flex items-center border-b border-gray-200 mb-5">
+                  <button
+                    onClick={() => setIncExcTab('inclusion')}
+                    className={`pb-3 px-4 font-bold text-base sm:text-lg transition-all relative ${
+                      incExcTab === 'inclusion'
+                        ? 'text-gray-900 font-black'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    Inclusion
+                    {incExcTab === 'inclusion' && (
+                      <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#F5B301] rounded-full" />
                     )}
-                  </div>
-
-                  {/* Exclusions */}
-                  <div className="bg-rose-50/40 border border-rose-200 rounded-2xl p-4">
-                    <h4 className="font-bold text-sm sm:text-base text-rose-900 mb-3 flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center">
-                        <X size={14} strokeWidth={3} />
-                      </div>
-                      Exclusions
-                    </h4>
-                    {(trip.exclusions || []).length > 0 ? (
-                      <ul className="space-y-2">
-                        {(trip.exclusions || []).map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-gray-800 font-medium">
-                            <X size={14} className="text-rose-500 mt-0.5 flex-shrink-0" strokeWidth={2.5} />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-xs text-gray-500">Personal expenses &amp; optional activities not included.</p>
+                  </button>
+                  <button
+                    onClick={() => setIncExcTab('exclusion')}
+                    className={`pb-3 px-4 font-bold text-base sm:text-lg transition-all relative ${
+                      incExcTab === 'exclusion'
+                        ? 'text-gray-900 font-black'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    Exclusion
+                    {incExcTab === 'exclusion' && (
+                      <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#F5B301] rounded-full" />
                     )}
-                  </div>
+                  </button>
                 </div>
+
+                {/* Sub-Tab Content */}
+                {incExcTab === 'inclusion' ? (
+                  <ul className="space-y-3 font-medium text-xs sm:text-sm text-gray-800">
+                    {parseListItems(trip.inclusions).length > 0 ? (
+                      parseListItems(trip.inclusions).map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs">
+                            <Check size={12} strokeWidth={3} />
+                          </div>
+                          <span className="leading-snug pt-0.5">{item}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-xs text-gray-500 italic">Standard transport &amp; stay included.</li>
+                    )}
+                  </ul>
+                ) : (
+                  <ul className="space-y-3 font-medium text-xs sm:text-sm text-gray-800">
+                    {parseListItems(trip.exclusions).length > 0 ? (
+                      parseListItems(trip.exclusions).map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs">
+                            <X size={12} strokeWidth={3} />
+                          </div>
+                          <span className="leading-snug pt-0.5">{item}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-xs text-gray-500 italic">Personal expenses &amp; optional activities not included.</li>
+                    )}
+                  </ul>
+                )}
               </div>
 
-              {/* COSTING CARD */}
+              {/* COSTING CARD (Matching Screenshot 2) */}
               <div id="section-costing" className="scroll-mt-48 md:scroll-mt-36 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                   Costing
                 </h3>
 
-                <div className="overflow-x-auto rounded-2xl border border-gray-200 w-full">
+                <div className="overflow-x-auto rounded-xl border border-gray-300 w-full">
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                      <tr className="bg-amber-400 text-gray-900 font-bold">
-                        <th className="py-3 px-4 sm:px-6 border-b border-gray-200 w-1/2">Price From</th>
-                        <th className="py-3 px-4 sm:px-6 border-b border-gray-200 w-1/2">Starting Price</th>
+                      <tr className="bg-[#F5B301] text-gray-900 font-extrabold">
+                        <th className="py-3 px-4 border border-gray-300 w-1/2">Price From</th>
+                        <th className="py-3 px-4 border border-gray-300 w-1/2 text-right sm:text-left">Starting Price</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white font-semibold text-gray-800">
                       {cityPrices.map(({ city, price }) => (
-                        <tr key={city} className="hover:bg-amber-50/30 transition-colors">
-                          <td className="py-3 px-4 sm:px-6">{city}</td>
-                          <td className="py-3 px-4 sm:px-6 font-extrabold text-gray-900">
+                        <tr key={city} className="hover:bg-amber-50/20 transition-colors">
+                          <td className="py-3 px-4 border border-gray-300">{city}</td>
+                          <td className="py-3 px-4 border border-gray-300 font-extrabold text-gray-900 text-right sm:text-left">
                             Rs. {price?.toLocaleString('en-IN')}/-
                           </td>
                         </tr>
                       ))}
                       {cityPrices.length === 0 && (
                         <tr>
-                          <td className="py-3 px-4 sm:px-6">Base Package</td>
-                          <td className="py-3 px-4 sm:px-6 font-extrabold">Rs. {trip.price?.toLocaleString('en-IN')}/-</td>
+                          <td className="py-3 px-4 border border-gray-300">Base Package</td>
+                          <td className="py-3 px-4 border border-gray-300 font-extrabold text-gray-900 text-right sm:text-left">
+                            Rs. {trip.price?.toLocaleString('en-IN')}/-
+                          </td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-500 font-medium mt-2">*All prices subject to +5% GST as applicable.</p>
+              </div>
+
+              {/* ADD ON CARD (Matching Screenshot 3) */}
+              <div id="section-addon" className="scroll-mt-48 md:scroll-mt-36 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                  Add On
+                </h3>
+
+                {trip.addons && trip.addons.length > 0 ? (
+                  <div className="overflow-x-auto rounded-xl border border-gray-300 w-full">
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                      <thead>
+                        <tr className="bg-[#F5B301] text-gray-900 font-extrabold">
+                          <th className="py-3 px-4 border border-gray-300 w-7/12">Add on options</th>
+                          <th className="py-3 px-4 border border-gray-300 w-5/12 text-right sm:text-left">Price Per Person</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 bg-white font-semibold text-gray-800">
+                        {trip.addons.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-amber-50/20 transition-colors">
+                            <td className="py-3 px-4 border border-gray-300">{item.option || item.name}</td>
+                            <td className="py-3 px-4 border border-gray-300 font-extrabold text-gray-900 text-right sm:text-left">
+                              Rs. {item.price ? Number(item.price).toLocaleString('en-IN') : '0'}/-
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 italic">No add-on options required for this tour.</p>
+                )}
               </div>
 
               {/* DATES CARD */}
@@ -857,26 +957,53 @@ const TripDetail = () => {
                 </div>
               </div>
 
-              {/* THINGS TO CARRY CARD */}
-              <div id="section-things-to-carry" className="scroll-mt-48 md:scroll-mt-36 bg-[#ffffff] border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
+              {/* THINGS TO CARRY CARD (Matching Screenshot 4) */}
+              <div id="section-things-to-carry" className="scroll-mt-48 md:scroll-mt-36 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                  Things to Carry
+                  Things To Carry
                 </h3>
-                {trip.thingsToCarry && trip.thingsToCarry.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {trip.thingsToCarry.map((item, i) => (
-                      <span key={i} className="px-3.5 py-2 bg-gray-100 text-gray-800 font-semibold text-xs sm:text-sm rounded-xl border border-gray-200 flex items-center gap-1.5">
-                        <Briefcase size={14} className="text-[#0d9488]" /> {item}
-                      </span>
+
+                {parseThingsToCarry(trip.thingsToCarry).length > 0 ? (
+                  <div className="space-y-4">
+                    {parseThingsToCarry(trip.thingsToCarry).map((cat, idx) => (
+                      <div key={idx} className="space-y-2">
+                        {cat.category && (
+                          <h4 className="font-extrabold text-sm sm:text-base text-gray-900">
+                            {cat.category}
+                          </h4>
+                        )}
+                        <ul className="space-y-2 pl-1 text-xs sm:text-sm font-medium text-gray-800">
+                          {cat.items.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2.5">
+                              <span className="text-gray-900 font-bold">•</span>
+                              <span className="leading-snug">
+                                {item.title ? (
+                                  <>
+                                    <strong className="font-bold text-gray-900">{item.title}:</strong> {item.detail}
+                                  </>
+                                ) : (
+                                  item.fullText
+                                )}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-gray-700 font-medium">
-                    <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Comfortable Rucksack</span>
-                    <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Trekking Shoes</span>
-                    <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Water Bottle (2L)</span>
-                    <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Warm Jacket / Raincoat</span>
-                    <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Original ID Proof</span>
+                  <div className="space-y-2 font-medium text-xs sm:text-sm text-gray-800">
+                    <h4 className="font-extrabold text-sm sm:text-base text-gray-900">Clothing &amp; Essentials</h4>
+                    <ul className="space-y-2 pl-1">
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-gray-900 font-bold">•</span>
+                        <span><strong className="font-bold text-gray-900">Thermal Wear:</strong> Essential for cold mornings and nights.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-gray-900 font-bold">•</span>
+                        <span><strong className="font-bold text-gray-900">Trekking Shoes:</strong> Good grip shoes with extra socks.</span>
+                      </li>
+                    </ul>
                   </div>
                 )}
               </div>

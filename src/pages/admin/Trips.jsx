@@ -294,14 +294,14 @@ const AdminTrips = () => {
   };
 
   const handleRemoveItinerary = (index) => {
-    const newItinerary = editingTrip.itinerary.filter((_, i) => i !== index);
+    const newItinerary = (editingTrip.itinerary || []).filter((_, i) => i !== index);
     setEditingTrip({ ...editingTrip, itinerary: newItinerary });
   };
 
   const handleAddAddon = () => {
-    setEditingTrip({ 
-      ...editingTrip, 
-      addons: [...(editingTrip.addons || []), { name: '', price: 0, description: '' }] 
+    setEditingTrip({
+      ...editingTrip,
+      addons: [...(editingTrip.addons || []), { option: '', price: '' }]
     });
   };
 
@@ -315,7 +315,7 @@ const AdminTrips = () => {
   };
 
   const handleRemoveAddon = (index) => {
-    const newAddons = editingTrip.addons.filter((_, i) => i !== index);
+    const newAddons = (editingTrip.addons || []).filter((_, i) => i !== index);
     setEditingTrip({ ...editingTrip, addons: newAddons });
   };
 
@@ -877,6 +877,53 @@ const AdminTrips = () => {
                         />
                       </div>
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Add On Options Section */}
+              <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+                <button type="button" onClick={() => toggleSection('addons')} className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                  <span className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <span className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center text-white text-sm">4b</span>
+                    Add On Options ({(editingTrip.addons || []).length})
+                  </span>
+                  {expandedSections.includes('addons') ? <ChevronUp size={20} className="text-gray-500" /> : <ChevronDown size={20} className="text-gray-500" />}
+                </button>
+                
+                {expandedSections.includes('addons') && (
+                  <div className="p-6 pt-2 space-y-3">
+                    {(editingTrip.addons || []).map((addon, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <input 
+                          type="text" 
+                          value={addon.option || addon.name || ''} 
+                          onChange={(e) => handleAddonChange(index, 'option', e.target.value)} 
+                          placeholder="Add on option name (e.g. Rooms at Kedarnath 4-5 Sharing)..."
+                          className="flex-1 w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-primary-500" 
+                        />
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <span className="text-xs font-bold text-gray-500">Rs.</span>
+                          <input 
+                            type="number" 
+                            value={addon.price || ''} 
+                            onChange={(e) => handleAddonChange(index, 'price', e.target.value)} 
+                            placeholder="Price per person..."
+                            className="w-32 bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-primary-500" 
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveAddon(index)} 
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={handleAddAddon} className="w-full py-2.5 border border-dashed border-gray-300 rounded-xl text-gray-600 hover:text-primary-600 hover:border-primary-500 transition-colors flex items-center justify-center gap-2 bg-white text-xs sm:text-sm font-bold">
+                      <PlusCircle size={16} /> Add New Add On Option
+                    </button>
                   </div>
                 )}
               </div>
