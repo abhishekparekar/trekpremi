@@ -271,26 +271,6 @@ const Home = () => {
           >
             {typedTagline}
           </motion.p>
-
-          {/* 2 CTA Action Buttons: Explore & Contact */}
-          <motion.div
-            variants={heroItemVariants}
-            className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mt-1"
-          >
-            <Link
-              to="/trips"
-              className="px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-full bg-[#F5B301] hover:bg-[#e0a200] text-gray-950 font-black text-xs sm:text-sm md:text-base shadow-lg transition-all active:scale-95 flex items-center gap-1.5"
-            >
-              Explore Tours <Compass size={16} />
-            </Link>
-
-            <Link
-              to="/contact"
-              className="px-5 py-2.5 sm:px-8 sm:py-3.5 rounded-full bg-white/15 hover:bg-white/30 text-white font-bold text-xs sm:text-sm md:text-base border border-white/40 backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
-            >
-              Contact Us <PhoneCall size={16} />
-            </Link>
-          </motion.div>
         </motion.div>
       </div>
 

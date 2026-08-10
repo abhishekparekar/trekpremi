@@ -155,30 +155,6 @@ const Hero = () => {
           <TypingText text="Adventure Starts With One Step — Let's Take It Together" />
         </motion.div>
 
-        {/* 2 CTA Buttons: Explore & Contact */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-          className="flex items-center justify-center gap-2.5 sm:gap-4 w-full px-4"
-        >
-          {/* Explore Button */}
-          <Link
-            to="/trips"
-            className="px-5 py-2.5 sm:px-7 sm:py-3 rounded-full bg-[#F5B301] hover:bg-[#e0a200] text-gray-950 font-black text-xs sm:text-sm md:text-base shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 min-w-[120px]"
-          >
-            Explore <Compass size={16} className="flex-shrink-0" />
-          </Link>
-
-          {/* Contact Button */}
-          <Link
-            to="/contact"
-            className="px-5 py-2.5 sm:px-7 sm:py-3 rounded-full bg-white/15 hover:bg-white/30 text-white font-bold text-xs sm:text-sm md:text-base border border-white/40 backdrop-blur-md transition-all active:scale-95 flex items-center justify-center gap-1.5 min-w-[120px]"
-          >
-            Contact <PhoneCall size={16} className="flex-shrink-0" />
-          </Link>
-        </motion.div>
-
       </div>
 
       {/* Stats bar (Fits perfectly at bottom on all screens) */}
