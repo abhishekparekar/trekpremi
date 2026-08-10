@@ -580,24 +580,21 @@ const TripDetail = () => {
                           {formatItineraryText(day.description)}
                         </p>
 
-                        {day.meals && (
-                          <div className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-800 px-3 py-1 rounded-lg text-xs font-bold">
-                            <Utensils size={13} className="text-[#0d9488]" />
-                            <span>Meals: {day.meals}</span>
+                        {day.showMealIcon !== false && (
+                          <div className="mt-3 p-3 bg-teal-50/80 border border-teal-200 rounded-xl flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-teal-100 text-[#0d9488] flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <Utensils size={16} />
+                            </div>
+                            <div>
+                              <h5 className="font-bold text-xs sm:text-sm text-gray-900 mb-0.5">Meals Included</h5>
+                              <p className="text-xs text-gray-600 font-medium">
+                                • {day.meals || 'Breakfast & Veg/Non-Veg Meals as per itinerary plan'}
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     ))}
-
-                    <div className="mt-4 p-3.5 bg-teal-50/70 border border-teal-200 rounded-2xl flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-teal-100 text-[#0d9488] flex items-center justify-center flex-shrink-0">
-                        <Utensils size={18} />
-                      </div>
-                      <div>
-                        <h5 className="font-bold text-xs sm:text-sm text-gray-900 mb-0.5">Meals Included</h5>
-                        <p className="text-xs text-gray-600 font-medium">• Breakfast &amp; Veg/Non-Veg Meals as per itinerary plan</p>
-                      </div>
-                    </div>
 
                     <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs sm:text-sm text-amber-900 font-medium">
                       <span className="font-bold text-red-600">*Note:</span> The timings mentioned in itinerary are tentative. The actual schedule will be shared in the WhatsApp group or provided on your tickets.

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, X, Upload, Calendar, ChevronDown, ChevronUp, PlusCircle, Trash, CheckCircle, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Upload, Calendar, ChevronDown, ChevronUp, PlusCircle, Trash, CheckCircle, Loader2, AlertCircle, Eye, EyeOff, Utensils } from 'lucide-react';
 import { deleteTrip, updateTrip, addTrip, uploadCompressedImage, subscribeToTrips, subscribeToCategories } from '../../firebase';
 
 const isSaturday = (dateStr) => {
@@ -280,7 +280,7 @@ const AdminTrips = () => {
       : 1;
     setEditingTrip({ 
       ...editingTrip, 
-      itinerary: [...currentItinerary, { day: newDay, title: '', description: '' }] 
+      itinerary: [...currentItinerary, { day: newDay, title: '', description: '', showMealIcon: true, meals: 'Breakfast & Veg/Non-Veg Meals as per itinerary plan' }] 
     });
   };
 
@@ -926,6 +926,30 @@ const AdminTrips = () => {
                           placeholder="Day description..."
                           className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500 resize-none focus:ring-1 focus:ring-primary-500" 
                         />
+
+                        {/* Meal Icon Show / Hide Toggle & Custom Meal Details */}
+                        <div className="pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-teal-50/70 p-3 rounded-xl border border-teal-100">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-teal-900 select-none">
+                            <input
+                              type="checkbox"
+                              checked={day.showMealIcon !== false}
+                              onChange={(e) => handleItineraryChange(index, 'showMealIcon', e.target.checked)}
+                              className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300 cursor-pointer"
+                            />
+                            <Utensils size={15} className="text-[#0d9488]" />
+                            <span>Show Meal Included Icon for Day {day.day}</span>
+                          </label>
+
+                          {day.showMealIcon !== false && (
+                            <input
+                              type="text"
+                              value={day.meals !== undefined ? day.meals : 'Breakfast & Veg/Non-Veg Meals as per itinerary plan'}
+                              onChange={(e) => handleItineraryChange(index, 'meals', e.target.value)}
+                              placeholder="Meal details (e.g. Breakfast & Veg/Non-Veg Meals)..."
+                              className="w-full sm:w-72 bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
+                            />
+                          )}
+                        </div>
                       </div>
                     ))}
                     <button type="button" onClick={handleAddItinerary} className="w-full py-3 border border-dashed border-gray-300 rounded-xl text-gray-500 hover:text-primary-600 hover:border-primary-500 transition-colors flex items-center justify-center gap-2 bg-white">
