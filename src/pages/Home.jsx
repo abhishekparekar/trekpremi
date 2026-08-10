@@ -189,8 +189,8 @@ const Home = () => {
         }
       `}</style>
 
-      {/* Hero Section - Compact on mobile, full height on desktop */}
-      <div className="relative w-full h-[72vh] min-h-[460px] md:h-screen bg-black overflow-hidden flex items-center justify-center pt-16 md:pt-0">
+      {/* Hero Section - Full height on mobile and desktop */}
+      <div className="relative w-full h-screen min-h-[600px] bg-black overflow-hidden flex items-center justify-center pt-16 md:pt-0">
         {/* Background Background Images Slider */}
         <AnimatePresence initial={false}>
           <motion.img

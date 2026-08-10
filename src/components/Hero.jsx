@@ -85,7 +85,7 @@ const StatItem = ({ icon, target, suffix, label, delay }) => {
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[72vh] sm:min-h-screen w-full flex flex-col justify-between overflow-hidden pt-16 sm:pt-24 pb-4 sm:pb-6" style={{ background: '#0a0a0a', isolation: 'isolate' }}>
+    <section className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden pt-16 sm:pt-24 pb-4 sm:pb-6" style={{ background: '#0a0a0a', isolation: 'isolate' }}>
 
       {/* Background image */}
       <div
