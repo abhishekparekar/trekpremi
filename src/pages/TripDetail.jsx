@@ -495,10 +495,10 @@ const TripDetail = () => {
               </div>
             </div>
 
-            {/* FIXED STICKY NAVIGATION TAB BAR PINNED DIRECTLY UNDER MOBILE & DESKTOP NAVBAR ON SCROLL */}
+            {/* FIXED STICKY NAVIGATION TAB BAR WITH BRAND YELLOW BG & BLACK TEXT */}
             <div
               ref={tabContainerRef}
-              className="sticky top-[114px] md:top-[80px] z-40 bg-[#008080] py-2.5 px-3 rounded-xl sm:rounded-2xl shadow-md mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar w-full border border-teal-600/30"
+              className="sticky top-[114px] md:top-[80px] z-40 bg-[#F5B301] py-2.5 px-3 rounded-xl sm:rounded-2xl shadow-md mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar w-full border border-amber-500/50"
             >
               {tabsList.map((t) => {
                 const isActive = activeTab === t.name;
@@ -506,10 +506,10 @@ const TripDetail = () => {
                   <button
                     key={t.name}
                     onClick={() => handleTabClick(t.name, t.id)}
-                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all duration-200 ${
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all duration-200 ${
                       isActive
-                        ? 'bg-[#004d4d] text-white underline underline-offset-4 decoration-2 shadow-inner scale-[1.02]'
-                        : 'text-teal-50 hover:bg-[#006666]'
+                        ? 'bg-black text-[#F5B301] underline underline-offset-4 decoration-2 shadow-md scale-[1.02]'
+                        : 'text-gray-950 hover:bg-black/10'
                     }`}
                   >
                     {t.name}
