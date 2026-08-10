@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, MapPin } from 'lucide-react';
+import { Menu, X, Search, MapPin, ChevronDown, Compass, ArrowRight } from 'lucide-react';
 import { useCachedTrips } from '../firebaseCache';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreToursOpen, setIsMoreToursOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [trips, setTrips] = useState([]);
+  
   const searchContainerRef = useRef(null);
   const mobileSearchContainerRef = useRef(null);
+  const moreToursRef = useRef(null);
   const desktopInputRef = useRef(null);
   const mobileInputRef = useRef(null);
   const location = useLocation();
@@ -84,6 +87,9 @@ const Navbar = () => {
       if (isOutsideDesktop && isOutsideMobile) {
         setIsSearchFocused(false);
       }
+      if (moreToursRef.current && !moreToursRef.current.contains(event.target)) {
+        setIsMoreToursOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -97,11 +103,13 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => { 
-    setIsMobileMenuOpen(false); 
+    setIsMobileMenuOpen(false);
+    setIsMoreToursOpen(false);
   }, [location]);
 
   const navLinks = [
     { name: 'Home', path: '/' },
+    { name: 'Tours & Treks', path: '/trips' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
     { name: 'Gallery', path: '/gallery' },
@@ -111,7 +119,6 @@ const Navbar = () => {
   const isTransparentPage = location.pathname === '/' || location.pathname.startsWith('/category/') || location.pathname.startsWith('/trip/');
   const isTransparent = isTransparentPage && !isScrolled;
 
-  // active check — handle query-param links too
   const isActive = (path) => {
     const [p, q] = path.split('?');
     if (q) {
@@ -133,6 +140,8 @@ const Navbar = () => {
       navigate(`/trip/${searchResults[0].id}`);
       setSearchQuery('');
       setIsSearchFocused(false);
+    } else {
+      navigate('/trips');
     }
   };
 
@@ -155,58 +164,131 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Center - Premium Search Pill */}
-          <div className="flex-1 mx-4 hidden md:block" ref={searchContainerRef}>
-            <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full h-[48px] rounded-full bg-white border border-[#dddddd] shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.18)] transition-shadow duration-200 pl-5 pr-2 py-2 cursor-text focus-within:bg-[#f7f7f7]">
-              <input
-                ref={desktopInputRef}
-                type="text"
-                placeholder="Search destinations, treks..."
-                value={searchQuery}
-                onFocus={() => setIsSearchFocused(true)}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearchFocused(true);
-                }}
-                className="flex-1 w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm text-[#222222] placeholder:text-[#717171] font-medium"
-              />
-              <button type="submit" className="bg-[#1B365D] p-2 rounded-full ml-2 flex-shrink-0 flex items-center justify-center hover:bg-[#0F233F] transition-colors shadow-sm">
-                <Search size={16} className="text-white" strokeWidth={2.5} />
+          {/* Center - Search Bar & More Tours Button (Laptop, PC, iPad) */}
+          <div className="flex-1 mx-4 hidden md:flex items-center gap-3">
+            <div className="flex-1 relative" ref={searchContainerRef}>
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full h-[48px] rounded-full bg-white border border-[#dddddd] shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.18)] transition-shadow duration-200 pl-5 pr-2 py-2 cursor-text focus-within:bg-[#f7f7f7]">
+                <input
+                  ref={desktopInputRef}
+                  type="text"
+                  placeholder="Search destinations, treks..."
+                  value={searchQuery}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchFocused(true);
+                  }}
+                  className="flex-1 w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm text-[#222222] placeholder:text-[#717171] font-medium"
+                />
+                <button type="submit" className="bg-[#1B365D] p-2 rounded-full ml-2 flex-shrink-0 flex items-center justify-center hover:bg-[#0F233F] transition-colors shadow-sm">
+                  <Search size={16} className="text-white" strokeWidth={2.5} />
+                </button>
+
+                {/* Suggestions Dropdown */}
+                {isSearchFocused && searchQuery.trim() && (
+                  <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.15)] border border-[#ebebeb] overflow-hidden z-[100] py-2">
+                    {searchResults.length > 0 ? (
+                      searchResults.map(trip => (
+                        <Link 
+                          key={trip.id}
+                          to={`/trip/${trip.id}`}
+                          onClick={() => {
+                            setSearchQuery('');
+                            setIsSearchFocused(false);
+                          }}
+                          className="flex items-center gap-4 px-5 py-3 hover:bg-[#f7f7f7] transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                            <img src={trip.images?.[0] || '/placeholder.jpg'} alt={trip.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-semibold text-[#222222] truncate">{trip.title}</h4>
+                            <p className="text-xs text-[#717171] truncate flex items-center gap-1 mt-0.5">
+                              <MapPin size={10} className="flex-shrink-0" /> <span className="truncate">{trip.location}</span>
+                            </p>
+                          </div>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-5 py-4 text-sm text-[#717171] text-center">
+                        No matching trips found
+                      </div>
+                    )}
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* MORE TOURS BUTTON (Laptop, PC, iPad Only) */}
+            <div className="relative flex-shrink-0 hidden md:block" ref={moreToursRef}>
+              <button
+                type="button"
+                onClick={() => setIsMoreToursOpen(!isMoreToursOpen)}
+                className="px-4 py-2.5 rounded-full bg-[#F5B301] text-gray-950 font-black text-xs lg:text-sm flex items-center gap-1.5 hover:bg-amber-400 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                <Compass size={16} />
+                <span>More Tours</span>
+                <ChevronDown size={15} className={`transition-transform duration-200 ${isMoreToursOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Suggestions Dropdown */}
-              {isSearchFocused && searchQuery.trim() && (
-                <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.15)] border border-[#ebebeb] overflow-hidden z-[100] py-2">
-                  {searchResults.length > 0 ? (
-                    searchResults.map(trip => (
-                      <Link 
+              {/* Dropdown Popup with Tours */}
+              {isMoreToursOpen && (
+                <div className="absolute right-0 top-[calc(100%+12px)] w-[360px] bg-white rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.18)] border border-[#ebebeb] overflow-hidden z-[100] p-4">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-100">
+                    <h3 className="text-xs font-extrabold text-[#0A2540] uppercase tracking-wider flex items-center gap-1.5">
+                      <Compass size={14} className="text-[#F5B301]" /> Popular Tour Packages
+                    </h3>
+                    <Link
+                      to="/trips"
+                      onClick={() => setIsMoreToursOpen(false)}
+                      className="text-[11px] font-bold text-amber-600 hover:text-amber-700 underline"
+                    >
+                      View All
+                    </Link>
+                  </div>
+
+                  {/* Trips List */}
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                    {trips.slice(0, 6).map((trip) => (
+                      <Link
                         key={trip.id}
                         to={`/trip/${trip.id}`}
-                        onClick={() => {
-                          setSearchQuery('');
-                          setIsSearchFocused(false);
-                        }}
-                        className="flex items-center gap-4 px-5 py-3 hover:bg-[#f7f7f7] transition-colors"
+                        onClick={() => setIsMoreToursOpen(false)}
+                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                          <img src={trip.images?.[0] || '/placeholder.jpg'} alt={trip.title} className="w-full h-full object-cover" />
-                        </div>
+                        <img
+                          src={trip.images?.[0] || '/placeholder.jpg'}
+                          alt={trip.title}
+                          className="w-12 h-12 rounded-lg object-cover bg-gray-100 flex-shrink-0 group-hover:scale-105 transition-transform"
+                        />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-semibold text-[#222222] truncate">{trip.title}</h4>
-                          <p className="text-xs text-[#717171] truncate flex items-center gap-1 mt-0.5">
-                            <MapPin size={10} className="flex-shrink-0" /> <span className="truncate">{trip.location}</span>
+                          <h4 className="text-xs font-bold text-gray-900 truncate group-hover:text-amber-600 transition-colors">
+                            {trip.title}
+                          </h4>
+                          <p className="text-[10px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                            <MapPin size={9} /> {trip.location || 'Maharashtra'}
                           </p>
+                          <span className="text-[11px] font-extrabold text-[#0A2540] block mt-0.5">
+                            ₹{Number(trip.price || 1699).toLocaleString('en-IN')}/-
+                          </span>
                         </div>
                       </Link>
-                    ))
-                  ) : (
-                    <div className="px-5 py-4 text-sm text-[#717171] text-center">
-                      No matching trips found
-                    </div>
-                  )}
+                    ))}
+                  </div>
+
+                  {/* Footer Link */}
+                  <div className="pt-3 mt-2 border-t border-gray-100 text-center">
+                    <Link
+                      to="/trips"
+                      onClick={() => setIsMoreToursOpen(false)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-gray-900 hover:text-amber-600 transition-colors"
+                    >
+                      Explore All Tour Packages <ArrowRight size={13} />
+                    </Link>
+                  </div>
                 </div>
               )}
-            </form>
+            </div>
           </div>
 
           {/* Right - Mobile Menu Button */}
@@ -289,7 +371,7 @@ const Navbar = () => {
         }`}
       >
         <div className="py-2">
-          {navLinks.map((link, index) => (
+          {navLinks.map((link) => (
             <div key={link.path}>
               <Link
                 to={link.path}
