@@ -1074,6 +1074,32 @@ const AdminTrips = () => {
                             </div>
                           )}
                         </div>
+
+                        {/* Per-Day Note Toggle & Input (Matching User Screenshot) */}
+                        <div className="pt-2.5 border-t border-gray-100 flex flex-col items-start gap-2.5 bg-amber-50/70 p-3 rounded-xl border border-amber-200 mt-2">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-900 select-none">
+                            <input
+                              type="checkbox"
+                              checked={day.showNote !== false}
+                              onChange={(e) => handleItineraryChange(index, 'showNote', e.target.checked)}
+                              className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500 border-gray-300 cursor-pointer"
+                            />
+                            <span>Show *Note: for Day {day.day}</span>
+                          </label>
+
+                          {day.showNote !== false && (
+                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center gap-1.5 pt-1 border-t border-amber-200/60">
+                              <span className="text-[11px] font-bold text-amber-900 flex-shrink-0">*Note Text:</span>
+                              <input
+                                type="text"
+                                value={day.noteText !== undefined ? day.noteText : ''}
+                                onChange={(e) => handleItineraryChange(index, 'noteText', e.target.value)}
+                                placeholder="Custom note e.g. Please report at the railway station on time as per the Pickup & Transportation schedule."
+                                className="w-full bg-white border border-amber-300 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-amber-500 font-medium"
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                     <button type="button" onClick={handleAddItinerary} className="w-full py-3 border border-dashed border-gray-300 rounded-xl text-gray-500 hover:text-primary-600 hover:border-primary-500 transition-colors flex items-center justify-center gap-2 bg-white">

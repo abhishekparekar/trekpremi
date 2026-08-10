@@ -32,6 +32,14 @@ const parseMealList = (mealsText) => {
   return [mealsText];
 };
 
+const parseItineraryPoints = (text) => {
+  if (!text) return [];
+  if (text.includes('\n')) {
+    return text.split('\n').map(s => s.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+  }
+  return text.split(/(?<=\.)\s+/).map(s => s.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+};
+
 const parseListItems = (data) => {
   if (!data) return [];
   if (Array.isArray(data)) return data.map(i => String(i).trim()).filter(Boolean);
@@ -109,6 +117,13 @@ const TripDetail = () => {
   // Active section tab & scroll states
   const [activeTab, setActiveTab] = useState('Highlight');
   const [incExcTab, setIncExcTab] = useState('inclusion');
+  const [openDayIndices, setOpenDayIndices] = useState([0]);
+
+  const toggleDayIndex = (idx) => {
+    setOpenDayIndices(prev => 
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    );
+  };
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // City filter for Dates section
@@ -645,71 +660,113 @@ const TripDetail = () => {
                 </h3>
 
                 {trip.itinerary && trip.itinerary.length > 0 ? (
-                  <div className="space-y-5">
-                    {trip.itinerary.map((day, idx) => (
-                      <div key={idx} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-[#0d9488] text-white text-xs font-black px-2.5 py-0.5 rounded-md">
-                            Day {day.day}
-                          </span>
-                          <h4 className="text-base sm:text-lg font-bold text-gray-900">
-                            {day.title}
-                          </h4>
+                  <div className="space-y-3">
+                    {trip.itinerary.map((day, idx) => {
+                      const isOpen = openDayIndices.includes(idx);
+                      const points = parseItineraryPoints(day.description);
+                      return (
+                        <div key={idx} className="border border-gray-200 rounded-2xl overflow-hidden">
+                          {/* Accordion Header */}
+                          <button
+                            type="button"
+                            onClick={() => toggleDayIndex(idx)}
+                            className="w-full flex items-center justify-between px-4 py-3 sm:py-4 bg-white hover:bg-gray-50 transition-colors text-left"
+                          >
+                            <div className="flex items-start gap-2 flex-1 min-w-0">
+                              <span className="text-[#0d9488] font-black text-sm sm:text-base whitespace-nowrap flex-shrink-0">
+                                Day - {day.day}
+                              </span>
+                              <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+                                {day.title}
+                              </h4>
+                            </div>
+                            <ChevronDown
+                              size={18}
+                              className={`flex-shrink-0 ml-2 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                            />
+                          </button>
+
+                          {/* Accordion Body */}
+                          {isOpen && (
+                            <div className="px-4 pb-4 pt-1 border-t border-gray-100 space-y-3">
+                              {/* Description Bullet Points */}
+                              {points.length > 0 ? (
+                                <ul className="space-y-2 text-xs sm:text-sm font-medium text-gray-800">
+                                  {points.map((pt, i) => {
+                                    // Bold text wrapped in **...**
+                                    const parts = pt.split(/(\*\*[^*]+\*\*)/g);
+                                    return (
+                                      <li key={i} className="flex items-start gap-2">
+                                        <span className="text-gray-900 font-bold mt-0.5 flex-shrink-0">•</span>
+                                        <span className="leading-snug">
+                                          {parts.map((part, pi) =>
+                                            part.startsWith('**') && part.endsWith('**')
+                                              ? <strong key={pi} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>
+                                              : <span key={pi}>{part}</span>
+                                          )}
+                                        </span>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              ) : (
+                                <p className="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+                                  {day.description}
+                                </p>
+                              )}
+
+                              {/* Per-Day Note */}
+                              {day.showNote !== false && day.noteText && (
+                                <p className="text-xs sm:text-sm font-medium text-gray-800 leading-relaxed pt-1">
+                                  <span className="font-bold text-red-600">*Note: </span>
+                                  {day.noteText}
+                                </p>
+                              )}
+
+                              {/* MEALS CARD */}
+                              {day.showMealIcon !== false && (day.meals || day.showMealIcon) && (
+                                <div className="mt-3 p-3 sm:p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3 shadow-xs">
+                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-100/80 flex items-center justify-center flex-shrink-0 border border-teal-200/60">
+                                    <Utensils size={20} className="text-[#0d9488]" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="font-extrabold text-sm text-gray-900 mb-1">Meals</h5>
+                                    <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
+                                      {parseMealList(day.meals).map((item, mi) => (
+                                        <li key={mi} className="flex items-start gap-2">
+                                          <span className="text-[#0d9488] font-bold">•</span>
+                                          <span className="leading-snug">{item}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* ACCOMMODATION CARD */}
+                              {day.showAccommodation && day.accommodation && (
+                                <div className="mt-2 p-3 sm:p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3 shadow-xs">
+                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-100/80 flex items-center justify-center flex-shrink-0 border border-teal-200/60">
+                                    <Home size={20} className="text-[#0d9488]" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="font-extrabold text-sm text-gray-900 mb-1">Accommodation</h5>
+                                    <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
+                                      {parseMealList(day.accommodation).map((item, ai) => (
+                                        <li key={ai} className="flex items-start gap-2">
+                                          <span className="text-[#0d9488] font-bold">•</span>
+                                          <span className="leading-snug">{item}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-
-                        <p className="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed whitespace-pre-line pl-0.5 mb-2">
-                          {formatItineraryText(day.description)}
-                        </p>
-
-                        {/* MEALS CARD (Matching Screenshot 1) */}
-                        {day.showMealIcon !== false && (day.meals || day.showMealIcon) && (
-                          <div className="mt-4 p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3.5 sm:gap-4 shadow-xs">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-teal-100/80 text-[#0d9488] flex items-center justify-center flex-shrink-0 border border-teal-200/60 shadow-xs">
-                              <Utensils size={24} className="text-[#0d9488]" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h5 className="font-extrabold text-sm sm:text-base text-gray-900 mb-1">
-                                Meals
-                              </h5>
-                              <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
-                                {parseMealList(day.meals).map((item, idx) => (
-                                  <li key={idx} className="flex items-start gap-2">
-                                    <span className="text-[#0d9488] font-bold">•</span>
-                                    <span className="leading-snug">{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* ACCOMMODATION CARD (Matching Screenshot 1) */}
-                        {day.showAccommodation && day.accommodation && (
-                          <div className="mt-3 p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3.5 sm:gap-4 shadow-xs">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-teal-100/80 text-[#0d9488] flex items-center justify-center flex-shrink-0 border border-teal-200/60 shadow-xs">
-                              <Home size={24} className="text-[#0d9488]" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h5 className="font-extrabold text-sm sm:text-base text-gray-900 mb-1">
-                                Accommodation
-                              </h5>
-                              <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
-                                {parseMealList(day.accommodation).map((item, idx) => (
-                                  <li key={idx} className="flex items-start gap-2">
-                                    <span className="text-[#0d9488] font-bold">•</span>
-                                    <span className="leading-snug">{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs sm:text-sm text-amber-900 font-medium">
-                      <span className="font-bold text-red-600">*Note:</span> The timings mentioned in itinerary are tentative. The actual schedule will be shared in the WhatsApp group or provided on your tickets.
-                    </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-gray-500 text-xs sm:text-sm italic">Custom itinerary details available upon request.</p>
