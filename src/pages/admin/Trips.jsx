@@ -321,7 +321,7 @@ const AdminTrips = () => {
 
   // Pickup Location handlers
   const handleAddPickupLocation = () => {
-    const newLocations = editingTrip.pickupLocations || [];
+    const newLocations = [...(editingTrip.pickupLocations || [])];
     newLocations.push({
       id: Date.now().toString(),
       location: '',
