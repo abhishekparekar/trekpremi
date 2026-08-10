@@ -198,6 +198,13 @@ const TripDetail = () => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   }, [trip]);
 
+  const highlightsList = useMemo(() => {
+    if (!trip || !trip.highlights) return [];
+    if (Array.isArray(trip.highlights)) return trip.highlights.map(h => String(h).trim()).filter(Boolean);
+    if (typeof trip.highlights === 'string') return trip.highlights.split(',').map(h => h.trim()).filter(Boolean);
+    return [];
+  }, [trip]);
+
   // Extract cities for filter dynamically
   const availableCities = useMemo(() => {
     const set = new Set();
@@ -545,25 +552,25 @@ const TripDetail = () => {
                   {trip.title} Highlights
                 </h3>
 
-                {trip.highlights && trip.highlights.length > 0 ? (
+                {highlightsList && highlightsList.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                      {trip.highlights.slice(0, 6).map((h, i) => (
-                        <div key={i} className="flex items-start gap-2.5 p-3 rounded-xl bg-teal-50/50 border border-teal-100">
-                          <MapPin className="w-4 h-4 text-[#0d9488] mt-0.5 flex-shrink-0" />
-                          <span className="text-xs sm:text-sm font-semibold text-gray-800">{h}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6 mb-5">
+                      {highlightsList.slice(0, 6).map((h, i) => (
+                        <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm font-semibold text-gray-900">
+                          <MapPin className="w-4 h-4 text-gray-900 mt-0.5 flex-shrink-0" />
+                          <span className="leading-snug">{h}</span>
                         </div>
                       ))}
                     </div>
 
-                    {trip.highlights.length > 6 && (
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-xs sm:text-sm mb-2">Other Highlights :</h4>
-                        <ul className="space-y-1.5 font-medium text-xs sm:text-sm text-gray-700">
-                          {trip.highlights.slice(6).map((h, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="text-[#0d9488] font-bold">•</span>
-                              <span>{h}</span>
+                    {highlightsList.length > 6 && (
+                      <div className="pt-3 border-t border-gray-100">
+                        <h4 className="font-extrabold text-gray-900 text-xs sm:text-sm mb-3">Other Highlights :</h4>
+                        <ul className="space-y-2 text-xs sm:text-sm font-medium text-gray-700">
+                          {highlightsList.slice(6).map((h, i) => (
+                            <li key={i} className="flex items-start gap-2.5">
+                              <span className="text-gray-900 font-bold">•</span>
+                              <span className="leading-snug">{h}</span>
                             </li>
                           ))}
                         </ul>
