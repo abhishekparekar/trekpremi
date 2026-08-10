@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, Clock, Star, Shield, ArrowRight, Calendar, X, Share2, Heart, ChevronRight, ChevronLeft,
   Loader2, Mountain, ChevronDown, Check, Compass, Plus, Minus, Users, Download, ArrowDown, ArrowUp,
-  MessageCircle, Utensils, Info, AlertCircle, PhoneCall, Camera, Briefcase
+  MessageCircle, Utensils, Info, AlertCircle, PhoneCall, Camera, Briefcase, Home
 } from 'lucide-react';
 import { getTripById, getTrips, saveLead } from '../firebase';
 import AllDatesModal from '../components/AllDatesModal';
@@ -12,6 +12,24 @@ import LeadCaptureModal from '../components/LeadCaptureModal';
 const formatItineraryText = (text) => {
   if (!text) return '';
   return text.replace(/([.,])(?!\d)\s*(?!$)/g, '$1\n');
+};
+
+const parseMealList = (mealsText) => {
+  if (!mealsText) return ['Breakfast & Veg/Non-Veg Meals as per itinerary plan'];
+  
+  if (mealsText.includes('\n')) {
+    return mealsText.split('\n').map(s => s.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+  }
+  
+  if (mealsText.includes(',')) {
+    return mealsText.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
+  if (mealsText.includes(' & ')) {
+    return mealsText.split(' & ').map(s => s.trim()).filter(Boolean);
+  }
+  
+  return [mealsText];
 };
 
 const isSaturday = (dateStr) => {
@@ -580,16 +598,46 @@ const TripDetail = () => {
                           {formatItineraryText(day.description)}
                         </p>
 
-                        {day.showMealIcon !== false && (
-                          <div className="mt-3 p-3 bg-teal-50/80 border border-teal-200 rounded-xl flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-teal-100 text-[#0d9488] flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Utensils size={16} />
+                        {/* MEALS CARD (Matching Screenshot 1) */}
+                        {day.showMealIcon !== false && (day.meals || day.showMealIcon) && (
+                          <div className="mt-4 p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3.5 sm:gap-4 shadow-xs">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-teal-100/80 text-[#0d9488] flex items-center justify-center flex-shrink-0 border border-teal-200/60 shadow-xs">
+                              <Utensils size={24} className="text-[#0d9488]" />
                             </div>
-                            <div>
-                              <h5 className="font-bold text-xs sm:text-sm text-gray-900 mb-0.5">Meals Included</h5>
-                              <p className="text-xs text-gray-600 font-medium">
-                                • {day.meals || 'Breakfast & Veg/Non-Veg Meals as per itinerary plan'}
-                              </p>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-extrabold text-sm sm:text-base text-gray-900 mb-1">
+                                Meals
+                              </h5>
+                              <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
+                                {parseMealList(day.meals).map((item, idx) => (
+                                  <li key={idx} className="flex items-start gap-2">
+                                    <span className="text-[#0d9488] font-bold">•</span>
+                                    <span className="leading-snug">{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ACCOMMODATION CARD (Matching Screenshot 1) */}
+                        {day.showAccommodation && day.accommodation && (
+                          <div className="mt-3 p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex items-start gap-3.5 sm:gap-4 shadow-xs">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-teal-100/80 text-[#0d9488] flex items-center justify-center flex-shrink-0 border border-teal-200/60 shadow-xs">
+                              <Home size={24} className="text-[#0d9488]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-extrabold text-sm sm:text-base text-gray-900 mb-1">
+                                Accommodation
+                              </h5>
+                              <ul className="space-y-1 text-xs sm:text-sm text-gray-700 font-medium">
+                                {parseMealList(day.accommodation).map((item, idx) => (
+                                  <li key={idx} className="flex items-start gap-2">
+                                    <span className="text-[#0d9488] font-bold">•</span>
+                                    <span className="leading-snug">{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
                             </div>
                           </div>
                         )}

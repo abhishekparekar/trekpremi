@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, X, Upload, Calendar, ChevronDown, ChevronUp, PlusCircle, Trash, CheckCircle, Loader2, AlertCircle, Eye, EyeOff, Utensils } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Upload, Calendar, ChevronDown, ChevronUp, PlusCircle, Trash, CheckCircle, Loader2, AlertCircle, Eye, EyeOff, Utensils, Home } from 'lucide-react';
 import { deleteTrip, updateTrip, addTrip, uploadCompressedImage, subscribeToTrips, subscribeToCategories } from '../../firebase';
 
 const isSaturday = (dateStr) => {
@@ -997,6 +997,33 @@ const AdminTrips = () => {
                                   className="w-full bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-teal-500 font-medium"
                                 />
                               </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Accommodation Icon Show / Hide Toggle & Custom Details */}
+                        <div className="pt-2.5 border-t border-gray-100 flex flex-col items-start gap-2.5 bg-teal-50/70 p-3 rounded-xl border border-teal-100 mt-2">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-teal-900 select-none">
+                            <input
+                              type="checkbox"
+                              checked={day.showAccommodation === true}
+                              onChange={(e) => handleItineraryChange(index, 'showAccommodation', e.target.checked)}
+                              className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300 cursor-pointer"
+                            />
+                            <Home size={15} className="text-[#0d9488]" />
+                            <span>Show Accommodation Included Icon for Day {day.day}</span>
+                          </label>
+
+                          {day.showAccommodation && (
+                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center gap-1.5 pt-1 border-t border-teal-200/60">
+                              <span className="text-[11px] font-bold text-teal-900 flex-shrink-0">Accommodation Detail:</span>
+                              <input
+                                type="text"
+                                value={day.accommodation || ''}
+                                onChange={(e) => handleItineraryChange(index, 'accommodation', e.target.value)}
+                                placeholder="e.g. Hotel in Hospet/Anegundi Side..."
+                                className="w-full bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-teal-500 font-medium"
+                              />
                             </div>
                           )}
                         </div>
