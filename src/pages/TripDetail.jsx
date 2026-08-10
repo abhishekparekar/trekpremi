@@ -96,6 +96,7 @@ const TripDetail = () => {
         { id: 'section-costing', tab: 'Costing' },
         { id: 'section-dates', tab: 'Dates' },
         { id: 'section-things-to-carry', tab: 'Things to Carry' },
+        { id: 'section-pickup', tab: 'Pickup & Transport' },
       ];
 
       const isMobile = window.innerWidth < 768;
@@ -393,6 +394,7 @@ const TripDetail = () => {
     { name: 'Costing', id: 'section-costing' },
     { name: 'Dates', id: 'section-dates' },
     { name: 'Things to Carry', id: 'section-things-to-carry' },
+    { name: 'Pickup & Transport', id: 'section-pickup' },
   ];
 
   return (
@@ -875,6 +877,59 @@ const TripDetail = () => {
                     <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Water Bottle (2L)</span>
                     <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Warm Jacket / Raincoat</span>
                     <span className="px-3.5 py-2 bg-gray-100 rounded-xl flex items-center gap-1.5"><Briefcase size={14} className="text-[#0d9488]" /> Original ID Proof</span>
+                  </div>
+                )}
+              </div>
+
+              {/* PICKUP LOCATION AND TRANSPORT CARD (Matching Screenshot 4) */}
+              <div id="section-pickup" className="scroll-mt-48 md:scroll-mt-36 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                  Pickup Location And Transport
+                </h3>
+
+                {trip.pickupLocations && trip.pickupLocations.length > 0 ? (
+                  <div className="space-y-4">
+                    {Object.entries(
+                      trip.pickupLocations.reduce((acc, p) => {
+                        const cityName = p.city || 'Standard Boarding / Pickup Points';
+                        if (!acc[cityName]) acc[cityName] = [];
+                        acc[cityName].push(p);
+                        return acc;
+                      }, {})
+                    ).map(([cityName, locs]) => (
+                      <div key={cityName} className="space-y-2">
+                        <h4 className="font-extrabold text-sm sm:text-base text-gray-900">
+                          {cityName.toLowerCase().includes('from') || cityName.toLowerCase().includes('board') ? cityName : `From ${cityName}`}
+                        </h4>
+                        <ul className="space-y-2 pl-1 font-medium text-xs sm:text-sm text-gray-800">
+                          {locs.map((loc, i) => (
+                            <li key={i} className="flex items-start gap-2.5">
+                              <span className="text-gray-900 font-bold">•</span>
+                              <span>
+                                <strong className="font-bold text-gray-900">{loc.location || loc.address}</strong>
+                                {loc.time ? ` - ${loc.time}` : ''}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3 font-medium text-xs sm:text-sm text-gray-800">
+                    <h4 className="font-extrabold text-sm sm:text-base text-gray-900">
+                      Standard Boarding / Pickup Points
+                    </h4>
+                    <ul className="space-y-2 pl-1">
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-gray-900 font-bold">•</span>
+                        <span><strong className="font-bold text-gray-900">Pune Boarding Points</strong> - Shared post booking in WhatsApp Group</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-gray-900 font-bold">•</span>
+                        <span><strong className="font-bold text-gray-900">Mumbai Boarding Points</strong> - Shared post booking in WhatsApp Group</span>
+                      </li>
+                    </ul>
                   </div>
                 )}
               </div>
