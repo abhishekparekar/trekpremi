@@ -1,7 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Layout from './components/Layout';
-import ScrollProgress from './components/ScrollProgress';
 import Home from './pages/Home';
 import Trips from './pages/Trips';
 import TripDetail from './pages/TripDetail';
@@ -30,7 +29,6 @@ function App() {
 
   return (
     <>
-      <ScrollProgress />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
