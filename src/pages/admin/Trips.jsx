@@ -927,8 +927,8 @@ const AdminTrips = () => {
                           className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500 resize-none focus:ring-1 focus:ring-primary-500" 
                         />
 
-                        {/* Meal Icon Show / Hide Toggle & Custom Meal Details */}
-                        <div className="pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-teal-50/70 p-3 rounded-xl border border-teal-100">
+                        {/* Meal Icon Show / Hide Toggle & Selection Options */}
+                        <div className="pt-2.5 border-t border-gray-100 flex flex-col items-start gap-2.5 bg-teal-50/70 p-3 rounded-xl border border-teal-100">
                           <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-teal-900 select-none">
                             <input
                               type="checkbox"
@@ -941,13 +941,63 @@ const AdminTrips = () => {
                           </label>
 
                           {day.showMealIcon !== false && (
-                            <input
-                              type="text"
-                              value={day.meals !== undefined ? day.meals : 'Breakfast & Veg/Non-Veg Meals as per itinerary plan'}
-                              onChange={(e) => handleItineraryChange(index, 'meals', e.target.value)}
-                              placeholder="Meal details (e.g. Breakfast & Veg/Non-Veg Meals)..."
-                              className="w-full sm:w-72 bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-teal-500"
-                            />
+                            <div className="w-full space-y-2 pt-2 border-t border-teal-200/60">
+                              {/* Meal Type Quick Select Pill Buttons */}
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-[11px] font-bold text-teal-900">Select Included Meals:</span>
+                                {[
+                                  { key: 'Breakfast', label: '🍳 Breakfast' },
+                                  { key: 'Lunch', label: '🍲 Lunch' },
+                                  { key: 'Dinner', label: '🍽️ Dinner' },
+                                  { key: 'Veg/Non-Veg Meals', label: '🥗 Veg/Non-Veg Meals' }
+                                ].map((opt) => {
+                                  const currentMeals = day.meals !== undefined ? day.meals : 'Breakfast & Veg/Non-Veg Meals as per itinerary plan';
+                                  const isSelected = currentMeals.toLowerCase().includes(opt.key.toLowerCase());
+
+                                  return (
+                                    <button
+                                      key={opt.key}
+                                      type="button"
+                                      onClick={() => {
+                                        let selectedKeys = ['Breakfast', 'Lunch', 'Dinner', 'Veg/Non-Veg Meals'].filter(k => 
+                                          k === opt.key ? !isSelected : currentMeals.toLowerCase().includes(k.toLowerCase())
+                                        );
+
+                                        let updatedMeals = '';
+                                        if (selectedKeys.length === 0) {
+                                          updatedMeals = 'Meals Included';
+                                        } else if (selectedKeys.length === 1) {
+                                          updatedMeals = `${selectedKeys[0]} Included`;
+                                        } else {
+                                          updatedMeals = `${selectedKeys.join(' & ')} as per itinerary plan`;
+                                        }
+
+                                        handleItineraryChange(index, 'meals', updatedMeals);
+                                      }}
+                                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
+                                        isSelected 
+                                          ? 'bg-[#0d9488] text-white border-[#0d9488] shadow-sm' 
+                                          : 'bg-white text-gray-700 border-gray-300 hover:bg-teal-50'
+                                      }`}
+                                    >
+                                      {opt.label} {isSelected ? '✓' : ''}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Editable Display Text Input */}
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 pt-1">
+                                <span className="text-[11px] font-bold text-teal-900 flex-shrink-0">Display Text:</span>
+                                <input
+                                  type="text"
+                                  value={day.meals !== undefined ? day.meals : 'Breakfast & Veg/Non-Veg Meals as per itinerary plan'}
+                                  onChange={(e) => handleItineraryChange(index, 'meals', e.target.value)}
+                                  placeholder="Meal details e.g. Breakfast & Veg/Non-Veg Meals..."
+                                  className="w-full bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-teal-500 font-medium"
+                                />
+                              </div>
+                            </div>
                           )}
                         </div>
                       </div>
