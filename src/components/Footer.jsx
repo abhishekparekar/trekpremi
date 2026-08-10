@@ -23,7 +23,7 @@ const Footer = () => {
   const socialLinks = [
     { icon: Facebook, href: '#', label: 'Facebook' },
     { icon: Instagram, href: 'https://www.instagram.com/trekpremii?igsh=N3U3ZGVhNmExZDRq&utm_source=qr', label: 'Instagram' },
-    { icon: WhatsAppIcon, href: 'https://wa.me/message/FH3CMQXFFIY2H1', label: 'WhatsApp' },
+    { icon: WhatsAppIcon, href: 'https://wa.me/919970280549', label: 'WhatsApp' },
     { icon: Youtube, href: '#', label: 'YouTube' },
   ];
 

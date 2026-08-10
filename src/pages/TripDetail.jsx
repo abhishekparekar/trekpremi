@@ -899,7 +899,7 @@ const TripDetail = () => {
                 </button>
 
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`Hi! I'm interested in booking *${trip.title}*. Please share details.`)}`}
+                  href={`https://wa.me/919970280549?text=${encodeURIComponent(`Hi! I'm interested in booking *${trip.title}*. Please share details.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 rounded-2xl text-sm transition-colors flex items-center justify-center gap-2 shadow-xs"
@@ -944,12 +944,13 @@ const TripDetail = () => {
         )}
 
         <a
-          href={`https://wa.me/?text=${encodeURIComponent(`Hi! I'm interested in booking *${trip.title}*. Please share details.`)}`}
+          href={`https://wa.me/919970280549?text=${encodeURIComponent(`Hi! I'm interested in booking *${trip.title}*. Please share details.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="w-12 h-12 lg:hidden rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
           title="Ask on WhatsApp"
         >
+
           <MessageCircle size={26} fill="white" />
         </a>
       </div>
