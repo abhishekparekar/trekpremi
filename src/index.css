@@ -106,9 +106,9 @@
     @apply transition-all duration-300 ease-out;
   }
 
-  div[class*="rounded-2xl"][class*="border"]:hover,
-  div[class*="rounded-xl"][class*="border"]:hover,
-  div[class*="rounded-3xl"][class*="shadow"]:hover {
+  div[class*="rounded-2xl"][class*="border"]:not([class*="sticky"]):hover,
+  div[class*="rounded-xl"][class*="border"]:not([class*="sticky"]):hover,
+  div[class*="rounded-3xl"][class*="shadow"]:not([class*="sticky"]):hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 8px 16px -6px rgba(0, 0, 0, 0.05);
   }
