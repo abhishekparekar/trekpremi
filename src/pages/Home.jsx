@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Loader2, Mountain, Compass, MapPin, Calendar } from 'lucide-react';
+import { Loader2, Mountain, Compass, MapPin, Calendar, PhoneCall } from 'lucide-react';
 import TripCard from '../components/TripCard';
 import { useCachedTrips, useCachedCategories } from '../firebaseCache';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -267,10 +267,30 @@ const Home = () => {
           {/* Tagline */}
           <motion.p
             variants={heroItemVariants}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium tracking-wide text-gray-200 max-w-4xl mx-auto leading-relaxed drop-shadow-lg min-h-[2em]"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium tracking-wide text-gray-200 max-w-4xl mx-auto leading-relaxed drop-shadow-lg min-h-[2em] mb-6"
           >
             {typedTagline}
           </motion.p>
+
+          {/* 2 CTA Action Buttons: Explore & Contact */}
+          <motion.div
+            variants={heroItemVariants}
+            className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-2"
+          >
+            <Link
+              to="/trips"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#F5B301] hover:bg-[#e0a200] text-gray-950 font-black text-sm sm:text-base shadow-lg transition-all active:scale-95 flex items-center gap-2"
+            >
+              Explore Tours <Compass size={18} />
+            </Link>
+
+            <Link
+              to="/contact"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-white/15 hover:bg-white/30 text-white font-bold text-sm sm:text-base border border-white/40 backdrop-blur-md transition-all active:scale-95 flex items-center gap-2"
+            >
+              Contact Us <PhoneCall size={18} />
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
 
